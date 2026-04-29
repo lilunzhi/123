@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>居以土成：丝路民居建筑文脉纪行</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- 封面页面 -->
+    <div id="cover-page" class="scene" style="background-image: url('素材1/封面.jpg'); background-size: cover; background-position: center; position: relative;">
+        <div class="cover-hint" style="position: absolute; bottom: 80px; left: 0; right: 0; margin: auto; width: fit-content;">点击进入</div>
+    </div>
+
+    <!-- 合并后的场景: 旅人和介绍 -->
+    <div id="opening-intro" class="scene hidden" style="background-image: url('素材1/背景-首页.png'); background-size: cover; background-position: center;">
+        <button id="skip-intro" class="skip-button">跳过</button>
+        <div class="combined-content">
+            <div class="traveler-container">
+                <div class="traveler"></div>
+            </div>
+            <div class="background-content">
+                <h1 class="main-title">居以土成</h1>
+                <h2 class="sub-title">—— 丝路民居建筑文脉纪行</h2>
+                <div class="intro-paragraphs">
+                    <p id="paragraph1">他是来自遥远西域的异域旅人，人们只叫他「行客」。</p>
+                    <p id="paragraph2">曾是丝绸之路上的商队向导，踏遍了陆路的戈壁与绿洲，也航过海路的风浪与远港。半生漂泊间，他记录下了沿途每一座城邦的建筑与风土。</p>
+                    <p id="paragraph3">如今，他将自己的所见所闻化作了这段旅程的引路人 —— 随着身影渐渐透明，他把丝路的故事、建筑的密码、旅途的记忆，完整地铺展在你的面前，邀请你重走这条连接东西方的文明之路，选择属于你的商队路线，去亲自触摸那些被时光封存的奇迹。</p>
+                </div>
+                <div class="choice-buttons">
+                    <button id="land-route">跟随陆路商队</button>
+                    <button id="sea-route">跟随海路商队</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 分支选择动画 -->
+    <div id="branch-animation" class="scene hidden">
+        <div class="camel-animation hidden"></div>
+        <div class="ship-animation hidden"></div>
+    </div>
+
+    <!-- 陆路路线交互 -->
+    <div id="land-route-content" class="scene hidden">
+        <div class="route-header">
+            <h2>陆路丝绸之路</h2>
+        </div>
+        <div class="station-container">
+            <div class="station" data-station="1">
+                <h3>到达陆路第一站——黄土窑洞</h3>
+                <div class="building-buttons">
+                    <button class="explore-building" data-building="1">了解建筑</button>
+                </div>
+            </div>
+            <div class="station" data-station="2">
+                <h3>到达陆路第二站——喀什古城民居</h3>
+                <div class="building-buttons">
+                    <button class="explore-building" data-building="2">了解建筑</button>
+                </div>
+            </div>
+        </div>
+        <button id="explore-sea-route" class="hidden">探索新路线</button>
+    </div>
+
+    <!-- 海路路线交互 -->
+    <div id="sea-route-content" class="scene hidden">
+        <div class="route-header">
+            <h2>海路丝绸之路</h2>
+        </div>
+        <div class="station-container">
+            <div class="station" data-station="1">
+                <h3>到达海路第一站——福建土楼</h3>
+                <div class="building-buttons">
+                    <button class="explore-building" data-building="1">了解建筑</button>
+                </div>
+            </div>
+            <div class="station" data-station="2">
+                <h3>到达海路第二站——广府民居</h3>
+                <div class="building-buttons">
+                    <button class="explore-building" data-building="2">了解建筑</button>
+                </div>
+            </div>
+        </div>
+        <button id="explore-land-route" class="hidden">探索新路线</button>
+    </div>
+
+    <!-- 建筑介绍页面 -->
+    <div id="building-intro" class="scene hidden">
+        <div class="building-header">
+            <h2 id="building-title"></h2>
+            <div class="progress-container">
+                <div class="pouch-icon-small"></div>
+                <span id="collection-progress">1/4</span>
+            </div>
+            <button id="back-to-route">返回路线</button>
+        </div>
+        <div class="building-content">
+            <div class="earth-animation hidden"></div>
+            <div class="building-display">
+                <div id="building-image"></div>
+                <div class="structure-points"></div>
+            </div>
+            <div class="manuscript">
+                <h3>风土笔记</h3>
+                <p id="building-description"></p>
+            </div>
+            <div class="traveler-note hidden">
+                <p>旅人笔记：这里记录着丝路建筑的智慧...</p>
+            </div>
+        </div>
+        <div class="route-progress">
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+            <button id="next-building" class="hidden">前往下一站</button>
+        </div>
+    </div>
+
+    <!-- 信息卡弹窗 -->
+    <div id="info-card" class="hidden">
+        <div class="info-card-content">
+            <h3 id="info-title"></h3>
+            <p id="info-desc"></p>
+        </div>
+    </div>
+
+    <!-- 风土弹窗 -->
+    <div id="风土-popup" class="hidden">
+        <div class="popup-content">
+            <h3 id="popup-title"></h3>
+            <div id="popup-illustration"></div>
+            <p id="popup-desc"></p>
+        </div>
+    </div>
+
+    <!-- 最终收尾 -->
+    <div id="final" class="scene hidden">
+        <h2>丝绸之路探索完成</h2>
+        <div class="final-icons">
+            <div class="icon-container">
+                <div class="pouch-icon"></div>
+                <div class="tooltip">沿途风土的收集</div>
+            </div>
+            <div class="icon-container">
+                <div class="manuscript-icon"></div>
+                <div class="tooltip">建筑文明的记录</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>

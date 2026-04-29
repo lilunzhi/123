@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>再会 - 丝路建筑之旅</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        @font-face {
+            font-family: 'Handdrawn';
+            src: local('KaiTi'), local('STKaiti'), local('楷体');
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Handdrawn', serif;
+            overflow: hidden;
+        }
+        
+        .farewell-page {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: url('素材1/背景-首页.png') center/cover no-repeat;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        /* 背景装饰元素 */
+        .background-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .desert-pattern {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: url('素材1/喀什 花纹1.png') center/contain no-repeat;
+            opacity: 0.1;
+        }
+        
+        .desert-pattern:nth-child(1) {
+            top: 10%;
+            left: 10%;
+            animation: float 10s ease-in-out infinite;
+        }
+        
+        .desert-pattern:nth-child(2) {
+            top: 20%;
+            right: 15%;
+            animation: float 12s ease-in-out infinite 1s;
+        }
+        
+        .desert-pattern:nth-child(3) {
+            bottom: 20%;
+            left: 15%;
+            animation: float 8s ease-in-out infinite 2s;
+        }
+        
+        .desert-pattern:nth-child(4) {
+            bottom: 10%;
+            right: 10%;
+            animation: float 11s ease-in-out infinite 3s;
+        }
+        
+        /* 主内容 */
+        .farewell-content {
+            position: relative;
+            z-index: 2;
+            max-width: 700px;
+        }
+        
+        .farewell-title {
+            font-size: 4rem;
+            color: #3e2723;
+            margin-bottom: 40px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            opacity: 0;
+            animation: fadeInUp 1.5s ease-out forwards;
+        }
+        
+        .farewell-text {
+            font-size: 1.5rem;
+            line-height: 2.2;
+            color: #5d4037;
+            margin-bottom: 60px;
+        }
+        
+        .farewell-text p {
+            margin: 15px 0;
+            opacity: 0;
+        }
+        
+        .quote-container {
+            position: relative;
+            padding: 30px;
+            margin: 40px 0;
+            background: rgba(255,255,255,0.8);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            opacity: 0;
+            animation: fadeIn 2s ease-out forwards 1s;
+        }
+        
+        .quote-mark {
+            font-size: 4rem;
+            color: #CD853F;
+            position: absolute;
+            top: -20px;
+            left: 20px;
+            line-height: 1;
+        }
+        
+
+        
+        /* 动画 */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-20px) rotate(5deg);
+            }
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .farewell-title {
+                font-size: 2.5rem;
+            }
+            
+            .farewell-text {
+                font-size: 1.2rem;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .action-button {
+                width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="farewell-page">
+        <!-- 背景装饰元素 -->
+        <div class="background-elements">
+            <div class="desert-pattern"></div>
+            <div class="desert-pattern"></div>
+            <div class="desert-pattern"></div>
+            <div class="desert-pattern"></div>
+        </div>
+        
+        <!-- 主内容 -->
+        <div class="farewell-content">
+            <h1 class="farewell-title">期待再会</h1>
+            
+            <div class="quote-container">
+                <div class="quote-mark">"</div>
+                <div class="farewell-text">
+                    <p style="animation: fadeIn 1s ease-out forwards 1.5s;">天地之变，兴废存亡，皆系于民。</p>
+                    <p style="animation: fadeIn 1s ease-out forwards 2s;">居者，土之子也。</p>
+                    <p style="animation: fadeIn 1s ease-out forwards 2.5s;">如果你路过这里，摸一摸墙——</p>
+                    <p style="animation: fadeIn 1s ease-out forwards 3s;">土是温的，因为丝路还在走</p>
+                </div>
+            </div>
+            
+
+        </div>
+    </div>
+    
+    <script>
+        // 页面加载完成后开始文字动画
+        window.onload = function() {
+            // 播放背景音乐
+            const backgroundMusic = new Audio('音效/音效/整体背景音乐.MP3');
+            backgroundMusic.loop = true;
+            backgroundMusic.volume = 0.15;
+            backgroundMusic.play().catch(e => {
+                console.log('背景音乐播放失败:', e);
+            });
+            
+            // 15秒后自动关闭页面
+            setTimeout(function() {
+                window.close(); // 在浏览器中可能被阻止
+                // 备选方案：返回首页
+                // window.location.href = 'index.html';
+            }, 15000);
+        };
+        
+
+    </script>
+</body>
+</html>

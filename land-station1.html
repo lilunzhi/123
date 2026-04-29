@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>陆路第一站 - 黄土窑洞</title>
+        <link rel="stylesheet" href="style.css">
+    <style>
+        /* 游戏对话模式样式 */
+        .dialogue-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .game-dialogue {
+            display: flex;
+            align-items: flex-end;
+            max-width: 800px;
+            width: 90%;
+            gap: 20px;
+        }
+        
+        .dialogue-portrait {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .portrait-image {
+            width: 100px;
+            height: 100px;
+            background: url('人物.png') center/contain no-repeat;
+            border-radius: 50%;
+            border: 3px solid #f5f0e6;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .portrait-name {
+            margin-top: 10px;
+            padding: 5px 15px;
+            background: #8d6e63;
+            color: white;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        
+        .dialogue-box {
+            flex: 1;
+            background: #fff8e7;
+            border-radius: 20px 20px 20px 5px;
+            padding: 35px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+        
+        .dialogue-text {
+            font-size: 1.3rem;
+            line-height: 1.6;
+            color: #3d2922;
+            margin-bottom: 20px;
+            font-family: 'KaiTi', 'STKaiti', serif;
+            font-weight: 500;
+        }
+        
+        .dialogue-indicator {
+            position: absolute;
+            bottom: 15px;
+            right: 30px;
+            color: #8d6e63;
+            font-size: 1.2rem;
+            animation: bounce 1.5s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(5px); }
+        }
+        
+        /* 土粒颜色 - 黄土窑洞 - 土黄色 */
+        .land-station1 .diamond-button::before,
+        .land-station1 .diamond-button::after {
+            background-color: #d4a574;
+        }
+        .land-station1 .diamond-button span::before,
+        .land-station1 .diamond-button span::after {
+            background-color: #c4956a;
+        }
+    </style>
+    <script src="script.js"></script>
+    </head>
+<body class="land-station1" style="background-image: url('素材1/背景-窑洞.png'); background-size: cover; background-position: center;">
+    <div class="container">
+        <!-- 对话弹窗 -->
+        <div id="dialogue-modal" class="dialogue-modal">
+            <div class="game-dialogue">
+                <div class="dialogue-portrait">
+                    <div class="portrait-image"></div>
+                    <div class="portrait-name">导游</div>
+                </div>
+                <div class="dialogue-box">
+                    <div class="dialogue-text" id="dialogue-text">欢迎来到丝路陆路第一站——黄土窑洞！</div>
+                    <div class="dialogue-indicator">▼</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 陆路第一站页面 -->
+        <div class="station-page">
+            <div class="station-header">
+                <h2>到达陆路第一站——黄土窑洞</h2>
+            </div>
+            
+            <div class="building-container overview">
+                <!-- 建筑图片 -->
+                <div class="building-image-wrapper">
+                    <div class="building-image" id="buildingImage">
+                    </div>
+                    
+                    <!-- 围绕圆圈的菱形模式切换按钮 -->
+                    <div class="diamond-buttons-container">
+                        <button class="diamond-button pos-top-left" onclick="playClickSound(); switchMode('list')"><span>简述</span></button>
+                        <button class="diamond-button pos-top-right" onclick="playClickSound(); switchMode('overview')"><span>结构元素</span></button>
+                        <button class="diamond-button pos-bottom-left" onclick="playClickSound(); switchMode('structure')"><span>建筑功能</span></button>
+                        <button class="diamond-button pos-bottom-right" onclick="playClickSound(); switchMode('detail')"><span>人文内涵</span></button>
+                    </div>
+                </div>
+                
+                <!-- 点位列表 -->
+                <div class="point-list" id="pointList" style="display: none;">
+                    <h3>建筑结构</h3>
+                    <div class="point-item" onclick="playClickSound(); showStructurePopup('窑洞入口', '窑洞的进出通道，通常朝南以获得充足的阳光')">窑洞入口</div>
+                    <div class="point-item" onclick="playClickSound(); showStructurePopup('窑洞内部', '居住空间，冬暖夏凉，是黄土高原特有的居住形式')">窑洞内部</div>
+                </div>
+                
+                <!-- 详细介绍 -->
+                <div class="building-details" id="buildingDetails" style="display: none;">
+                    <h3>黄土窑洞</h3>
+                    <p><strong>建筑类型：</strong>传统民居</p>
+                    <p><strong>分布地区：</strong>黄土高原</p>
+                    <p><strong>特点：</strong>冬暖夏凉，节约土地，施工简单</p>
+                    <p><strong>建造材料：</strong>黄土</p>
+                    <p><strong>结构：</strong>窑洞式，依山开凿而成</p>
+                    <p><strong>风土关联：</strong>黄土高原地区气候干燥，黄土层深厚，适合开凿窑洞。窑洞冬暖夏凉的特点，适应了当地的气候条件。</p>
+                </div>
+            </div>
+
+            <!-- 弹窗遮罩层 -->
+            <div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)">
+                <div class="modal-card">
+                    <span class="modal-close" onclick="closeModal()">&times;</span>
+                    <div id="modalInnerContent"></div>
+                </div>
+            </div>
+            
+            <div class="arrow-buttons">
+                <button class="next-station-button" onclick="playClickSound(); goToNextStation('黄土窑洞', '一')">探索下一站</button>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+    <script>
+        let currentMode = '';
+        
+        // 对话控制变量
+        let currentDialogueIndex = 0;
+        const dialogues = [
+            '欢迎来到丝路陆路第一站——黄土窑洞！',
+            '这里是中国传统民居的瑰宝。',
+            '让我们一起探索它的独特魅力吧！'
+        ];
+        
+        // 对话控制函数
+        function nextDialogue() {
+            currentDialogueIndex++;
+            if (currentDialogueIndex < dialogues.length) {
+                document.getElementById('dialogue-text').textContent = dialogues[currentDialogueIndex];
+            } else {
+                const dialogueModal = document.getElementById('dialogue-modal');
+                dialogueModal.style.display = 'none';
+                // 对话结束后播放引导语音
+                playVoicePrompt('语音提示/语音提示1/首先，请点击左上方的简述按钮，了解黄土窑洞的基础介绍.MP3');
+                // 高亮简述按钮
+                highlightButton('pos-top-left');
+            }
+        }
+        
+        // 页面加载完成后执行
+        window.addEventListener('DOMContentLoaded', function() {
+            // 为对话框添加点击事件
+            document.querySelector('.game-dialogue').addEventListener('click', nextDialogue);
+            
+            // 播放黄土窑洞背景音乐
+            playBackgroundMusic('cave');
+            // 播放欢迎语音
+            setTimeout(() => {
+                const welcomeAudio = new Audio('语音提示/语音提示1/欢迎来到丝路陆路第一站--黄土窑洞.MP3');
+                welcomeAudio.volume = 1.0;
+                welcomeAudio.play().catch(e => {
+                    console.log('语音提示播放失败:', e);
+                });
+            }, 500);
+        });
+
+        // 语音提示播放函数
+        function playVoicePrompt(audioPath) {
+            try {
+                const audio = new Audio(audioPath);
+                audio.volume = 1.0;
+                audio.play().catch(e => {
+                    console.log('语音提示播放失败:', e);
+                });
+            } catch (e) {
+                console.log('语音提示创建失败:', e);
+            }
+        }
+
+        // 高亮按钮函数
+        function highlightButton(positionClass) {
+            // 移除所有按钮的高亮状态
+            document.querySelectorAll('.diamond-button').forEach(btn => {
+                btn.classList.remove('highlighted');
+            });
+            // 高亮指定位置的按钮
+            const targetButton = document.querySelector(`.diamond-button.${positionClass}`);
+            if (targetButton) {
+                targetButton.classList.add('highlighted');
+            }
+        }
+
+        // 播放背景音乐函数
+        function playBackgroundMusic(type) {
+            let audioPath = '';
+            
+            switch(type) {
+                case 'cave':
+                    audioPath = '音效/音效/黄土窑洞＋风声.MP3';
+                    break;
+                case 'kashgar':
+                    audioPath = '音效/音效/新疆喀什＋风声.MP3';
+                    break;
+                case 'tulou':
+                    audioPath = '音效/音效/福建土楼+海浪+海鸟.MP3';
+                    break;
+                case 'cantonese':
+                    audioPath = '音效/音效/广府民居+海浪+海鸟.MP3';
+                    break;
+            }
+            
+            try {
+                const audio = new Audio(audioPath);
+                audio.loop = true;
+                audio.volume = 0.15;
+                audio.play().catch(e => {
+                    console.log('背景音乐播放失败:', e);
+                });
+            } catch (e) {
+                console.log('背景音乐创建失败:', e);
+            }
+        }
+
+        // 播放点击音效函数
+        function playClickSound() {
+            const audioPath = '音效/音效/陆上丝绸之路点击音效（砖块）.MP3';
+            
+            try {
+                const audio = new Audio(audioPath);
+                audio.volume = 0.8;
+                audio.play().catch(e => {
+                    console.log('点击音效播放失败:', e);
+                });
+            } catch (e) {
+                console.log('点击音效创建失败:', e);
+            }
+        }
+
+        // 切换模式
+        function switchMode(mode) {
+            const container = document.querySelector('.building-container');
+            const pointList = document.getElementById('pointList');
+            const buildingDetails = document.getElementById('buildingDetails');
+            const modalOverlay = document.getElementById('modalOverlay');
+            const modalInnerContent = document.getElementById('modalInnerContent');
+            
+            // 记录当前模式
+            currentMode = mode;
+            
+            // 移除所有模式类
+            container.classList.remove('overview', 'list-mode', 'detail-mode', 'structure-mode');
+            
+            // 隐藏所有内容
+            pointList.style.display = 'none';
+            buildingDetails.style.display = 'none';
+            
+            // 根据模式显示对应内容
+            if (mode === 'overview') {
+                // 结构元素 - 显示三张图片（网格布局）
+                const content = `
+                    <h3>结构元素</h3>
+                    <div class="image-gallery">
+                        <div class="gallery-item">
+                            <div class="flip-card">
+                                <div class="flip-card-inner">
+                                    <div class="flip-card-front">
+                                        <img src="素材1/窑洞 花纹1.png" alt="窑洞花纹1">
+                                    </div>
+                                    <div class="flip-card-back">
+                                        <p>文字纹：福、禄、寿、喜、五子登科等吉祥文字</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <p>文字纹</p>
+                        </div>
+                        <div class="gallery-item">
+                            <div class="flip-card">
+                                <div class="flip-card-inner">
+                                    <div class="flip-card-front">
+                                        <img src="素材1/窑洞 花纹2.png" alt="窑洞花纹2">
+                                    </div>
+                                    <div class="flip-card-back">
+                                        <p>几何纹：万字纹、回纹、菱形、枪刺梅花、蛇抱蛋等传统图案</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <p>几何纹</p>
+                        </div>
+                        <div class="gallery-item">
+                            <div class="flip-card">
+                                <div class="flip-card-inner">
+                                    <div class="flip-card-front">
+                                        <img src="素材1/窑洞 花纹3.png" alt="窑洞花纹3">
+                                    </div>
+                                    <div class="flip-card-back">
+                                        <p>花卉瑞兽：牡丹、莲花、梅兰竹菊、龙凤、狮子滚绣球等图案</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <p>花卉瑞兽</p>
+                        </div>
+                    </div>
+                `;
+                modalInnerContent.innerHTML = content;
+                modalOverlay.classList.add('active');
+            } else if (mode === 'list') {
+                // 简述 - 显示建筑的简单描述
+                const content = `
+                    <div class="overview-content">
+                        <h3>建筑简述</h3>
+                        <div class="overview-image">
+                            <img src="建筑-改/窑洞 - 副本.png" alt="黄土窑洞">
+                        </div>
+                        <p>黄土窑洞是黄土高原地区的传统民居建筑，以其独特的窑洞式布局、冬暖夏凉的特点而闻名。这些建筑适应了黄土高原的地理环境和气候特点，同时体现了陕北文化的深厚底蕴。</p>
+                        <p>窑洞通常依山开凿而成，施工简单，节约土地，是中国传统民居建筑的重要组成部分。</p>
+                    </div>
+                `;
+                modalInnerContent.innerHTML = content;
+                modalOverlay.classList.add('active');
+            } else if (mode === 'detail') {
+                // 人文内涵 - 显示一张图片（放大2倍，鼠标悬停时图片左滑，文字显示在右边）
+                const content = `
+                    <h3>人文内涵</h3>
+                    <div class="humanity-container">
+                        <div class="humanity-image">
+                            <img src="素材1/窑洞 人文1.png" alt="窑洞人文">
+                        </div>
+                        <div class="humanity-text">
+                            <h4>窑洞文化</h4>
+                            <p>黄土窑洞不仅是居住空间，更是陕北文化的载体。其建筑风格、装饰艺术和空间布局都体现了陕北人民的生活智慧和文化传承。</p>
+                            <p>通过这些建筑，我们可以感受到黄土高原的历史脉络和人文精神，了解陕北文化的独特魅力。</p>
+                        </div>
+                    </div>
+                `;
+                modalInnerContent.innerHTML = content;
+                modalOverlay.classList.add('active');
+                // 添加 animate-in 类以显示内容
+                setTimeout(() => {
+                    const humanityContainer = modalInnerContent.querySelector('.humanity-container');
+                    if (humanityContainer) {
+                        humanityContainer.classList.add('animate-in');
+                    }
+                }, 100);
+            } else if (mode === 'structure') {
+                // 建筑功能 - 显示一张图片（放大2倍）
+                const content = `
+                    <h3>建筑功能</h3>
+                    <div class="image-gallery-large">
+                        <div class="gallery-item-large">
+                            <div class="magnifying-glass">
+                                <img src="素材1/窑洞 人文1.png" alt="窑洞线条图">
+                            </div>
+                            <p>冬暖夏凉：窑洞的特殊结构使其具有良好的保温隔热性能，适应黄土高原的气候特点</p>
+                            <p>节约土地：窑洞依山开凿，不占用耕地，适应黄土高原的地形特点</p>
+                        </div>
+                    </div>
+                `;
+                modalInnerContent.innerHTML = content;
+                modalOverlay.classList.add('active');
+                // 添加 animate-in 类以显示内容
+                setTimeout(() => {
+                    const imageGallery = modalInnerContent.querySelector('.image-gallery-large');
+                    if (imageGallery) {
+                        imageGallery.classList.add('animate-in');
+                    }
+                }, 100);
+            }
+        }
+
+        function showModalContent(sourceElement) {
+            const modalOverlay = document.getElementById('modalOverlay');
+            const modalInnerContent = document.getElementById('modalInnerContent');
+            
+            // 克隆内容或直接移动内容到弹窗
+            modalInnerContent.innerHTML = sourceElement.innerHTML;
+            modalOverlay.classList.add('active');
+            
+            // 允许弹窗内的点击事件
+            const points = modalInnerContent.querySelectorAll('.point-item');
+            points.forEach(point => {
+                // 重新绑定点击事件（如果需要）
+                // 这里我们假设 html 中的 onclick 仍然有效
+            });
+        }
+
+        function closeModal() {
+            const modalOverlay = document.getElementById('modalOverlay');
+            modalOverlay.classList.remove('active');
+            
+            // 根据当前模式决定下一步操作
+            if (currentMode === 'list') {
+                // 简述按钮被点击，接下来引导结构元素
+                setTimeout(() => {
+                    const nextAudio = new Audio('语音提示/语音提示1/接下来请点击右上方的结构元素按钮，认识窑洞的建筑构造.MP3');
+                    nextAudio.volume = 1.0;
+                    nextAudio.play().catch(e => {
+                        console.log('语音提示播放失败:', e);
+                    });
+                    // 高亮结构元素按钮
+                    highlightButton('pos-top-right');
+                }, 500);
+            } else if (currentMode === 'overview') {
+                // 结构元素按钮被点击，接下来引导建筑功能
+                setTimeout(() => {
+                    const nextAudio = new Audio('语音提示/语音提示1/请点击左下方的建筑功能按钮，了解窑洞的实用作用.MP3');
+                    nextAudio.volume = 1.0;
+                    nextAudio.play().catch(e => {
+                        console.log('语音提示播放失败:', e);
+                    });
+                    // 高亮建筑功能按钮
+                    highlightButton('pos-bottom-left');
+                }, 500);
+            } else if (currentMode === 'structure') {
+                // 建筑功能按钮被点击，接下来引导人文内涵
+                setTimeout(() => {
+                    const nextAudio = new Audio('语音提示/语音提示1/最后请点击右下方的人文内涵按钮，读懂窑洞背后的文化精神.MP3');
+                    nextAudio.volume = 1.0;
+                    nextAudio.play().catch(e => {
+                        console.log('语音提示播放失败:', e);
+                    });
+                    // 高亮人文内涵按钮
+                    highlightButton('pos-bottom-right');
+                }, 500);
+            } else if (currentMode === 'detail') {
+                // 人文内涵按钮被点击，所有按钮都已点击
+                setTimeout(() => {
+                    const nextAudio = new Audio('语音提示/语音提示1/四个知识点都学习完毕啦，现在可以点击下方红色探索下一站按钮，继续前往丝路旅途下一站.MP3');
+                    nextAudio.volume = 1.0;
+                    nextAudio.play().catch(e => {
+                        console.log('语音提示播放失败:', e);
+                    });
+                    // 移除所有按钮高亮
+                    document.querySelectorAll('.diamond-button').forEach(btn => {
+                        btn.classList.remove('highlighted');
+                    });
+                }, 500);
+            }
+        }
+
+        function handleOverlayClick(event) {
+            if (event.target === document.getElementById('modalOverlay')) {
+                closeModal();
+            }
+        }
+        
+        // 显示结构弹窗
+        function showStructurePopup(title, description) {
+            // 创建弹窗元素
+            const popup = document.createElement('div');
+            popup.className = 'structure-popup';
+            
+            // 弹窗内容
+            popup.innerHTML = `
+                <div class="popup-content">
+                    <span class="popup-close" onclick="closePopup(this)">&times;</span>
+                    <h4>${title}</h4>
+                    <p>${description}</p>
+                </div>
+            `;
+            
+            // 添加到页面
+            document.body.appendChild(popup);
+            
+            // 点击空白处关闭弹窗
+            popup.addEventListener('click', function(e) {
+                if (e.target === popup) {
+                    closePopup(popup);
+                }
+            });
+        }
+        
+        // 关闭弹窗
+        function closePopup(element) {
+            const popup = element.closest('.structure-popup');
+            if (popup) {
+                popup.remove();
+            }
+        }
+
+        // 前往下一站
+        function goToNextStation(buildingName, count) {
+            showAchievement(buildingName, count);
+            setTimeout(() => {
+                playVoicePrompt('语音提示/语音提示1/恭喜通关黄土窑洞！成功获得黄土与窑洞建筑手稿收藏。收获已解锁，继续出发探索下一站吧！.MP3');
+            }, 1000);
+            setEarthManuscriptNextAction(() => {
+                const overlay = document.createElement('div');
+                overlay.className = 'transition-overlay fade-out camel';
+                document.body.appendChild(overlay);
+
+                setTimeout(() => {
+                    const animationContainer = document.createElement('div');
+                    animationContainer.className = 'transition-animation';
+
+                    const camelAnimation = document.createElement('div');
+                    camelAnimation.className = 'camel-transition';
+                    animationContainer.appendChild(camelAnimation);
+
+                    document.body.appendChild(animationContainer);
+
+                    playSound('wind');
+
+                    setTimeout(() => {
+                        animationContainer.classList.add('fade-out');
+                        setTimeout(() => {
+                            document.body.removeChild(overlay);
+                            document.body.removeChild(animationContainer);
+                            window.location.href = 'land-station2.html';
+                        }, 300);
+                    }, 2000);
+                }, 300);
+            });
+        }
+    </script>
+</body>
+</html>

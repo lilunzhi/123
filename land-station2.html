@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>陆路第二站 - 喀什古城民居</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* 游戏对话模式样式 */
+        .dialogue-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .game-dialogue {
+            display: flex;
+            align-items: flex-end;
+            max-width: 800px;
+            width: 90%;
+            gap: 20px;
+        }
+        
+        .dialogue-portrait {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .portrait-image {
+            width: 100px;
+            height: 100px;
+            background: url('人物.png') center/contain no-repeat;
+            border-radius: 50%;
+            border: 3px solid #f5f0e6;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .portrait-name {
+            margin-top: 10px;
+            padding: 5px 15px;
+            background: #8d6e63;
+            color: white;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        
+        .dialogue-box {
+            flex: 1;
+            background: #fff8e7;
+            border-radius: 20px 20px 20px 5px;
+            padding: 35px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+        
+        .dialogue-text {
+            font-size: 1.3rem;
+            line-height: 1.6;
+            color: #3d2922;
+            margin-bottom: 20px;
+            font-family: 'KaiTi', 'STKaiti', serif;
+            font-weight: 500;
+        }
+        
+        .dialogue-indicator {
+            position: absolute;
+            bottom: 15px;
+            right: 30px;
+            color: #8d6e63;
+            font-size: 1.2rem;
+            animation: bounce 1.5s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(5px); }
+        }
+        
+        /* 土粒颜色 - 喀什古城民居 - 深红色 */
+        .land-station2 .diamond-button::before,
+        .land-station2 .diamond-button::after {
+            background-color: #8b2635;
+        }
+        .land-station2 .diamond-button span::before,
+        .land-station2 .diamond-button span::after {
+            background-color: #a63446;
+        }
+    </style>
+    <script src="script.js"></script>
+</head>
+<body class="land-station2" style="background-image: url('素材1/背景-喀什.png'); background-size: cover; background-position: center;">
+    <div class="container">
+        <!-- 对话弹窗 -->
+        <div id="dialogue-modal" class="dialogue-modal">
+            <div class="game-dialogue">
+                <div class="dialogue-portrait">
+                    <div class="portrait-image"></div>
+                    <div class="portrait-name">导游</div>
+                </div>
+                <div class="dialogue-box">
+                    <div class="dialogue-text" id="dialogue-text">欢迎来到丝路陆路第二站——喀什古城民居！</div>
+                    <div class="dialogue-indicator">▼</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 陆路第二站页面 -->
+        <div class="station-page">
+            <div class="station-header">
+                <h2>到达陆路第二站——喀什古城民居</h2>
+            </div>
+            
+            <div class="building-container overview">
+                <!-- 建筑图片 -->
+                <div class="building-image-wrapper">
+                    <div class="building-image" id="buildingImage">
+                    </div>
+                    
+                    <!-- 围绕圆圈的菱形模式切换按钮 -->
+                    <div class="diamond-buttons-container">
+                        <button class="diamond-button pos-top-left" onclick="playClickSound(); switchMode('list')"><span>简述</span></button>
+                        <button class="diamond-button pos-top-right" onclick="playClickSound(); switchMode('overview')"><span>结构元素</span></button>
+                        <button class="diamond-button pos-bottom-left" onclick="playClickSound(); switchMode('structure')"><span>建筑功能</span></button>
+                        <button class="diamond-button pos-bottom-right" onclick="playClickSound(); switchMode('detail')"><span>人文内涵</span></button>
+                    </div>
+                </div>
+                
+                <!-- 点位列表 -->
+                <div class="point-list" id="pointList" style="display: none;">
+                    <h3>建筑结构</h3>
+                    <div class="point-item" onclick="playClickSound(); showStructurePopup('庭院', '民居的中心空间，用于家庭活动和休息')">庭院</div>
+                    <div class="point-item" onclick="playClickSound(); showStructurePopup('晾房', '用于晾晒葡萄等农产品的特殊建筑')">晾房</div>
+                </div>
+                
+                <!-- 详细介绍 -->
+                <div class="building-details" id="buildingDetails" style="display: none;">
+                    <h3>喀什古城民居</h3>
+                    <p><strong>建筑类型：</strong>传统民居</p>
+                    <p><strong>分布地区：</strong>新疆喀什</p>
+                    <p><strong>特点：</strong>民族特色浓郁，布局紧凑，适应沙漠气候</p>
+                    <p><strong>建造材料：</strong>土木</p>
+                    <p><strong>结构：</strong>庭院式，多为两层建筑</p>
+                    <p><strong>风土关联：</strong>喀什地区气候干旱，夏季炎热，冬季寒冷。民居的庭院设计有利于通风降温，土木结构则具有良好的保温隔热性能。</p>
+                </div>
+            </div>
+
+            <!-- 弹窗遮罩层 -->
+            <div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)">
+                <div class="modal-card">
+                    <span class="modal-close" onclick="closeModal()">&times;</span>
+                    <div id="modalInnerContent"></div>
+                </div>
+            </div>
+            
+            <div class="navigation-buttons" id="navButtons">
+                <!-- 按钮将由 JS 动态生成 -->
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+    <script>
+        let currentMode = '';
+        
+        // 对话控制变量
+        let currentDialogueIndex = 0;
+        const dialogues = [
+            '欢迎来到丝路陆路第二站——喀什古城民居！',
+            '这里是新疆维吾尔族的传统民居。',
+            '让我们一起探索它的独特魅力吧！'
+        ];
+        
+        // 对话控制函数
+        function nextDialogue() {
+            currentDialogueIndex++;
+            if (currentDialogueIndex < dialogues.length) {
+                document.getElementById('dialogue-text').textContent = dialogues[currentDialogueIndex];
+            } else {
+                const dialogueModal = document.getElementById('dialogue-modal');
+                dialogueModal.style.display = 'none';
+                // 对话结束后播放引导语音
+                playVoicePrompt('语音提示/语音提示2/语音提示2/首先，请点击左上方的简述按钮，了解新疆喀什古城民居的基础介绍.MP3');
+                // 高亮简述按钮
+                highlightButton('pos-top-left');
+            }
+        }
+        
+        // 页面加载时记录陆路完成并更新按钮
+        window.addEventListener('DOMContentLoaded', function() {
+            // 为对话框添加点击事件
+            document.querySelector('.game-dialogue').addEventListener('click', nextDialogue);
+            
+            markRouteCompleted('land');
+            updateNavButtons();
+
+            // 播放喀什古城背景音乐
+            playBackgroundMusic('kashgar');
+            // 播放欢迎语音
+            setTimeout(() => {
+                const welcomeAudio = new Audio('语音提示/语音提示2/语音提示2/欢迎来到丝路陆路第二站--新疆喀什.MP3');
+                welcomeAudio.volume = 1.0;
+                welcomeAudio.play().catch(e => {
+                    console.log('语音提示播放失败:', e);
+                });
+            }, 500);
+        });
+
+        // 语音提示播放函数
+        function playVoicePrompt(audioPath) {
+            try {
+                const audio = new Audio(audioPath);
+                audio.volume = 1.0;
+                audio.play().catch(e => {
+                    console.log('语音提示播放失败:', e);
+                });
+            } catch (e) {
+                console.log('语音提示创建失败:', e);
+            }
+        }
+
+        // 高亮按钮函数
+        function highlightButton(positionClass) {
+            // 移除所有按钮的高亮状态
+            document.querySelectorAll('.diamond-button').forEach(btn => {
+                btn.classList.remove('highlighted');
+            });
+            // 高亮指定位置的按钮
+            const targetButton = document.querySelector(`.diamond-button.${positionClass}`);
+            if (targetButton) {
+                targetButton.classList.add('highlighted');
+            }
+        }
+
+        // 播放背景音乐函数
+        function playBackgroundMusic(type) {
+            let audioPath = '';
+            
+            switch(type) {
+                case 'cave':
+                    audioPath = '音效/音效/黄土窑洞＋风声.MP3';
+                    break;
+                case 'kashgar':
+                    audioPath = '语音提示/语音提示2/新疆喀什古城民居-背景音.MP3';
+                    break;
+                case 'tulou':
+                    audioPath = '音效/音效/福建土楼+海浪+海鸟.MP3';
+                    break;
+                case 'cantonese':
+                    audioPath = '音效/音效/广府民居+海浪+海鸟.MP3';
+                    break;
+            }
+            
+            try {
+                const audio = new Audio(audioPath);
+                audio.loop = true;
+                audio.volume = 0.15;
+                audio.play().catch(e => {
+                    console.log('背景音乐播放失败:', e);
+                });
+            } catch (e) {
+                console.log('背景音乐创建失败:', e);
+            }
+        }
+
+        // 播放点击音效函数
+        function playClickSound() {
+            const audioPath = '音效/音效/陆上丝绸之路点击音效（砖块）.MP3';
+            
+            try {
+                const audio = new Audio(audioPath);
+                audio.volume = 0.8;
+                audio.play().catch(e => {
+                    console.log('点击音效播放失败:', e);
+                });
+            } catch (e) {
+                console.log('点击音效创建失败:', e);
+            }
+        }
+
+        function updateNavButtons() {
+            const progress = getRouteProgress();
+            const navContainer = document.getElementById('navButtons');
+            navContainer.innerHTML = ''; // 清空
+
+            if (progress.land && progress.sea) {
+                // 两条路都完了，显示探索结束，查看行囊
+                const exitBtn = document.createElement('button');
+                exitBtn.className = 'finish-btn';
+                exitBtn.textContent = '探索结束，查看行囊';
+                exitBtn.onclick = finishRoute;
+                navContainer.appendChild(exitBtn);
+            } else {
+                // 陆路刚完，海路没完
+                const redoBtn = document.createElement('button');
+                redoBtn.className = 'explore-other-btn'; // 复用样式
+                redoBtn.style.backgroundColor = '#8d6e63'; // 陆路色
+                redoBtn.textContent = '重走陆路';
+                redoBtn.onclick = () => window.location.href = 'land-station1.html';
+                
+                const seaBtn = document.createElement('button');
+                seaBtn.className = 'explore-other-btn';
+                seaBtn.textContent = '探索海路';
+                seaBtn.onclick = exploreOtherRoute;
+
+                navContainer.appendChild(redoBtn);
+                navContainer.appendChild(seaBtn);
+            }
+        }
+
+        // 切换模式
+        function switchMode(mode) {
+            const container = document.querySelector('.building-container');
+            const pointList = document.getElementById('pointList');
+            const buildingDetails = document.getElementById('buildingDetails');
+            const modalOverlay = document.getElementById('modalOverlay');
+            const modalInnerContent = document.getElementById('modalInnerContent');
+            
+            // 记录当前模式
+            currentMode = mode;
+            
+            // 移除所有模式类
+            container.classList.remove('overview', 'list-mode', 'detail-mode', 'structure-mode');
+            
+            // 隐藏所有内容
+            pointList.style.display = 'none';
+            buildingDetails.style.display = 'none';
+            
+            // 根据模式显示对应内容
+            if (mode === 'overview') {
+                // 结构元素 - 显示两张喀什花纹图片
+                const content = `
+                    <h3>结构元素</h3>
+                    <div class="kashi-patterns-container">
+                        <div class="pattern-item pattern-left">
+                            <div class="pattern-image">
+                                <img src="素材1/喀什 花纹1.png" alt="喀什花纹1">
+                            </div>
+                            <div class="pattern-text">
+                                <h4>花卉纹样</h4>
+                                <p>喀什传统花卉纹样，体现维吾尔族文化特色，常用于建筑装饰</p>
+                            </div>
+                        </div>
+                        <div class="pattern-item pattern-right">
+                            <div class="pattern-image">
+                                <img src="素材1/喀什 花纹2.png" alt="喀什花纹2">
+                            </div>
+                            <div class="pattern-text">
+                                <h4>葡萄纹样</h4>
+                                <p>葡萄纹样是喀什建筑常见装饰元素，象征丰收和吉祥</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                modalInnerContent.innerHTML = content;
+                modalOverlay.classList.add('active');
+                
+                // 添加动画效果
+                setTimeout(() => {
+                    const container = document.querySelector('.kashi-patterns-container');
+                    if (container) {
+                        container.classList.add('animate-in');
+                    }
+                }, 100);
+            } else if (mode === 'list') {
+                // 简述 - 显示建筑的简单描述
+                const content = `
+                    <div class="overview-content">
+                        <h3>建筑简述</h3>
+                        <div class="overview-image">
+                            <img src="建筑-改/喀什2.png" alt="喀什古城民居">
+                        </div>
+                        <p>喀什古城民居是新疆喀什地区的传统民居建筑，以其独特的民族特色、紧凑的布局和适应沙漠气候的设计而闻名。这些建筑体现了维吾尔族的文化特色和生活智慧。</p>
+                        <p>喀什古城民居通常采用土木结构，庭院式布局，通风良好，是中国传统民居建筑的重要组成部分。</p>
+                    </div>
+                `;
+                modalInnerContent.innerHTML = content;
+                modalOverlay.classList.add('active');
+            } else if (mode === 'detail') {
+                // 人文内涵 - 显示创新的卡片翻转效果
+                const content = `
+                    <h3>人文内涵</h3>
+                    <div class="humanity-showcase">
+                        <div class="humanity-card">
+                            <div class="card-inner">
+                                <div class="card-front">
+                                    <div class="card-image">
+                                        <img src="素材1/喀什 人文1.png" alt="喀什人文1">
+                                    </div>
+                                    <div class="card-title">迷宫街巷</div>
+                                </div>
+                                <div class="card-back">
+                                    <h4>迷宫街巷</h4>
+                                    <p>无中轴线、随高崖地形蜿蜒，形成"户户相连、家家相通"的邻里网络，是传统社群关系的空间映射。</p>
+                                    <div class="card-decoration"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="humanity-card">
+                            <div class="card-inner">
+                                <div class="card-front">
+                                    <div class="card-image">
+                                        <img src="素材1/喀什 人文2.png" alt="喀什人文2">
+                                    </div>
+                                    <div class="card-title">功能合一</div>
+                                </div>
+                                <div class="card-back">
+                                    <h4>功能合一</h4>
+                                    <p>楼下作坊、楼上居住（如高台民居的土陶世家），建筑就是生产与生活的共同体。</p>
+                                    <div class="card-decoration"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                modalInnerContent.innerHTML = content;
+                modalOverlay.classList.add('active');
+                // 添加 animate-in 类以显示内容
+                setTimeout(() => {
+                    const showcase = modalInnerContent.querySelector('.humanity-showcase');
+                    if (showcase) {
+                        showcase.classList.add('animate-in');
+                    }
+                }, 100);
+            } else if (mode === 'structure') {
+                // 建筑功能 - 显示两张图片（左右排布，放大2倍）
+                const content = `
+                    <h3>建筑功能</h3>
+                    <div class="image-gallery-large">
+                        <div class="gallery-item-large">
+                            <div class="magnifying-glass">
+                                <img src="素材1/喀什 自然.png" alt="喀什自然1">
+                            </div>
+                            <p>高低错落：喀什民居依崖而建，形成高低错落的建筑布局，适应地形特点</p>
+                        </div>
+                        <div class="gallery-item-large">
+                            <div class="magnifying-glass">
+                                <img src="素材1/喀什 自然2.png" alt="喀什自然2">
+                            </div>
+                            <p>依崖而建：充分利用地形优势，建筑与自然环境融为一体</p>
+                        </div>
+                    </div>
+                `;
+                modalInnerContent.innerHTML = content;
+                modalOverlay.classList.add('active');
+                // 添加 animate-in 类以显示内容
+                setTimeout(() => {
+                    const imageGallery = modalInnerContent.querySelector('.image-gallery-large');
+                    if (imageGallery) {
+                        imageGallery.classList.add('animate-in');
+                    }
+                }, 100);
+            }
+        }
+
+        function showModalContent(sourceElement) {
+            const modalOverlay = document.getElementById('modalOverlay');
+            const modalInnerContent = document.getElementById('modalInnerContent');
+            modalInnerContent.innerHTML = sourceElement.innerHTML;
+            modalOverlay.classList.add('active');
+        }
+
+        function closeModal() {
+            const modalOverlay = document.getElementById('modalOverlay');
+            modalOverlay.classList.remove('active');
+            
+            // 根据当前模式决定下一步操作
+            if (currentMode === 'list') {
+                // 简述按钮被点击，接下来引导结构元素
+                setTimeout(() => {
+                    const nextAudio = new Audio('语音提示/语音提示2/语音提示2/接下来请点击右上方的结构元素按钮，认识喀什古城民居的建筑构造.MP3');
+                    nextAudio.volume = 1.0;
+                    nextAudio.play().catch(e => {
+                        console.log('语音提示播放失败:', e);
+                    });
+                    // 高亮结构元素按钮
+                    highlightButton('pos-top-right');
+                }, 500);
+            } else if (currentMode === 'overview') {
+                // 结构元素按钮被点击，接下来引导建筑功能
+                setTimeout(() => {
+                    const nextAudio = new Audio('语音提示/语音提示2/语音提示2/请点击左下方的建筑功能按钮，了解喀什古城民居的实用作用.MP3');
+                    nextAudio.volume = 1.0;
+                    nextAudio.play().catch(e => {
+                        console.log('语音提示播放失败:', e);
+                    });
+                    // 高亮建筑功能按钮
+                    highlightButton('pos-bottom-left');
+                }, 500);
+            } else if (currentMode === 'structure') {
+                // 建筑功能按钮被点击，接下来引导人文内涵
+                setTimeout(() => {
+                    const nextAudio = new Audio('语音提示/语音提示2/语音提示2/最后请点击右下方的人文内涵按钮，读懂喀什古城民居背后的文化精神.MP3');
+                    nextAudio.volume = 1.0;
+                    nextAudio.play().catch(e => {
+                        console.log('语音提示播放失败:', e);
+                    });
+                    // 高亮人文内涵按钮
+                    highlightButton('pos-bottom-right');
+                }, 500);
+            } else if (currentMode === 'detail') {
+                // 人文内涵按钮被点击，所有按钮都已点击
+                setTimeout(() => {
+                    // 检查路线进度
+                    let progress = JSON.parse(localStorage.getItem('silkRoadProgress') || '{"land": false, "sea": false}');
+                    let audioPath;
+                    
+                    if (!progress.sea) {
+                        // 还未完成海路，提示选择路线
+                        audioPath = '语音提示/语音提示2/语音提示2/四个知识点都学习完毕啦，现在可以选择重走陆路或者探索海路，继续前往丝路旅途下一站.MP3';
+                    } else {
+                        // 已完成海路，播放通关提示
+                        audioPath = '语音提示/语音提示2/语音提示2/四个知识点都学习完毕啦！恭喜通关新疆喀什！成功获得黄土与喀什古城民居建筑手稿收藏。收获已解锁.MP3';
+                    }
+                    
+                    const nextAudio = new Audio(audioPath);
+                    nextAudio.volume = 1.0;
+                    nextAudio.play().catch(e => {
+                        console.log('语音提示播放失败:', e);
+                    });
+                    // 移除所有按钮高亮
+                    document.querySelectorAll('.diamond-button').forEach(btn => {
+                        btn.classList.remove('highlighted');
+                    });
+                }, 500);
+            }
+        }
+
+        function handleOverlayClick(event) {
+            if (event.target === document.getElementById('modalOverlay')) {
+                closeModal();
+            }
+        }
+        
+        // 显示结构弹窗
+        function showStructurePopup(title, description) {
+            // 创建弹窗元素
+            const popup = document.createElement('div');
+            popup.className = 'structure-popup';
+            
+            // 弹窗内容
+            popup.innerHTML = `
+                <div class="popup-content">
+                    <span class="popup-close" onclick="closePopup(this)">&times;</span>
+                    <h4>${title}</h4>
+                    <p>${description}</p>
+                </div>
+            `;
+            
+            // 添加到页面
+            document.body.appendChild(popup);
+            
+            // 点击空白处关闭弹窗
+            popup.addEventListener('click', function(e) {
+                if (e.target === popup) {
+                    closePopup(popup);
+                }
+            });
+        }
+        
+        // 关闭弹窗
+        function closePopup(element) {
+            const popup = element.closest('.structure-popup');
+            if (popup) {
+                popup.remove();
+            }
+        }
+        
+        function showTransitionAnimation(type) {
+            const overlay = document.createElement('div');
+            overlay.className = 'transition-overlay fade-out ' + type;
+            document.body.appendChild(overlay);
+
+            setTimeout(() => {
+                const animationContainer = document.createElement('div');
+                animationContainer.className = 'transition-animation';
+
+                const animationElement = document.createElement('div');
+                animationElement.className = type === 'ship' ? 'ship-transition' : 'camel-transition';
+                animationContainer.appendChild(animationElement);
+
+                document.body.appendChild(animationContainer);
+
+                playSound('wind');
+
+                setTimeout(() => {
+                    animationContainer.classList.add('fade-out');
+                    setTimeout(() => {
+                        document.body.removeChild(overlay);
+                        document.body.removeChild(animationContainer);
+                        if (type === 'ship') {
+                            window.location.href = 'sea-station1.html';
+                        } else if (type === 'camel') {
+                            window.location.href = 'land-station1.html';
+                        }
+                    }, 300);
+                }, 2000);
+            }, 300);
+        }
+        
+        // 探索其他路线
+        function exploreOtherRoute() {
+            // 显示收集土的成就
+            showAchievement('喀什古城民居', '二');
+            // 播放通关恭喜语音
+            setTimeout(() => {
+                playVoicePrompt('语音提示/语音提示2/语音提示2/恭喜通关新疆喀什！成功获得黄土与喀什古城民居建筑手稿收藏。收获已解锁，继续出发探索下一站吧！.MP3');
+            }, 1000);
+            // 设置后续操作为显示过渡动画并跳转
+            setEarthManuscriptNextAction(function() {
+                setTimeout(() => {
+                    showTransitionAnimation('ship');
+                }, 300);
+            });
+        }
+
+        // 结束探索
+        function finishRoute() {
+            // 显示收集土的成就
+            showAchievement('喀什古城民居', '二');
+            // 播放通关恭喜语音
+            setTimeout(() => {
+                playVoicePrompt('语音提示/语音提示2/语音提示2/恭喜通关新疆喀什！成功获得黄土与喀什古城民居建筑手稿收藏。收获已解锁，继续出发探索下一站吧！.MP3');
+            }, 1000);
+            // 设置跳转目标为结束页面
+            setEarthManuscriptNextPage('end.html');
+        }
+    </script>
+</body>
+</html>
